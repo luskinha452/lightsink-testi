@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#07090e" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <title>LIGHTSYNC Mobile BT — Android</title>
+  <style>
+    :root {
+      --bg-0: #06080d;
+      --bg-1: #0e131f;
+      --bg-2: #161f30;
+      --accent: #00b4ff;
+      --purple: #b700ff;
+      --text: #f2f6ff;
+      --muted: #8a9bb5;
+      --border: rgba(255, 255, 255, 0.09);
+      --ok: #00e676;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      background: radial-gradient(circle at 50% 0%, #131f38 0%, var(--bg-0) 75%);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 84px;
+    }
+
+    .topbar {
+      padding: 14px 16px;
+      background: rgba(14, 19, 31, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, var(--accent), var(--purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      color: #fff;
+      box-shadow: 0 0 14px rgba(0, 180, 255, 0.4);
+    }
+
+    .brand h1 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.6px; }
+    .brand small { font-size: 10px; color: var(--accent); display: block; font-family: monospace; }
+
+    .bt-pill {
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--ok);
+      box-shadow: 0 0 8px var(--ok);
+    }
+
+    .container {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-width: 540px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: rgba(16, 23, 37, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card h2 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--muted);
+    }
+
+    .stage {
+      position: relative;
+      height: 190px;
+      border-radius: 12px;
+      background: radial-gradient(circle at 50% 50%, #17233b 0%, #070a10 85%);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .stage-glow {
+      position: absolute;
+      inset: 0;
+      transition: background 0.1s linear;
+    }
+
+    .stage img {
+      position: relative;
+      z-index: 2;
+      width: 88%;
+      height: 88%;
+      object-fit: contain;
+    }
+
+    .zones-2x2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .zcard {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .zcard strong { font-size: 12px; display: block; }
+    .zcard span { font-size: 10px; color: var(--muted); font-family: monospace; }
+
+    input[type="color"] {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 2px solid rgba(255,255,255,0.25);
+      background: transparent;
+    }
+
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 11px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-2);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, #0095ff, #00c8ff);
+      color: #03101f;
+      border: none;
+      font-weight: 700;
+    }
+
+    .btn.active {
+      border-color: var(--accent);
+      background: rgba(0, 180, 255, 0.18);
+      box-shadow: 0 0 14px rgba(0, 180, 255, 0.2);
+    }
+
+    .swatches {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .swatch {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.25);
+      cursor: pointer;
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      accent-color: var(--accent);
+    }
+
+    .pkt-box {
+      font-family: monospace;
+      font-size: 10px;
+      background: #04070d;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px;
+      max-height: 110px;
+      overflow-y: auto;
+      color: #00d2ff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">G</div>
+      <div>
+        <h1>LIGHTSYNC Android BT</h1>
+        <small id="statusSub">BLE GATT HID++ 0x8070 / Bridge</small>
+      </div>
+    </div>
+    <div class="bt-pill" onclick="connectWebBluetoothBle()">
+      <span class="dot" id="connDot"></span>
+      <span id="connLabel">Conectar BLE</span>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Conexão Bluetooth & Modo -->
+    <div class="card">
+      <h2>Conexão Bluetooth (BLE GATT / RFCOMM / Bridge G560)</h2>
+      <div class="btn-row">
+        <button class="btn primary" onclick="connectWebBluetoothBle()">📶 Parear BLE HID++</button>
+        <button class="btn" onclick="connectUsbOtgIfNative()">🔌 USB-C OTG Direto</button>
+      </div>
+      <small style="font-size:11px; color:var(--muted); line-height:1.4;">
+        💡 <strong>Nota de Hardware G560:</strong> No G560, o Bluetooth interno é A2DP (Áudio), enquanto os LEDs (`0x8070`) ficam no controlador USB. Você pode tocar música via Bluetooth no G560 e controlar os LEDs em tempo real por aqui!
+      </small>
+    </div>
+
+    <!-- Visualizador 4 Zonas -->
+    <div class="card">
+      <h2>Zonas RGB em Tempo Real (G560 / HID++ 0x8070)</h2>
+      <div class="stage">
+        <div class="stage-glow" id="stageGlow"></div>
+        <img src="/assets/g560_front.png" onerror="this.style.display='none'" alt="G560" />
+      </div>
+
+      <div class="zones-2x2">
+        <div class="zcard" id="zc-0">
+          <div><strong>Z1 Frontal Esq.</strong><span id="zh-0">#00B4FF</span></div>
+          <input type="color" value="#00b4ff" onchange="setZone(0, this.value)" />
+        </div>
+        <div class="zcard" id="zc-2">
+          <div><strong>Z3 Frontal Dir.</strong><span id="zh-2">#00B4FF</span></div>
+          <input type="color" value="#00b4ff" onchange="setZone(2, this.value)" />
+        </div>
+        <div class="zcard" id="zc-1">
+          <div><strong>Z2 Traseira Esq.</strong><span id="zh-1">#A000FF</span></div>
+          <input type="color" value="#a000ff" onchange="setZone(1, this.value)" />
+        </div>
+        <div class="zcard" id="zc-3">
+          <div><strong>Z4 Traseira Dir.</strong><span id="zh-3">#A000FF</span></div>
+          <input type="color" value="#a000ff" onchange="setZone(3, this.value)" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Modos & Motores -->
+    <div class="card">
+      <h2>Motores de Iluminação</h2>
+      <div class="btn-row">
+        <button class="btn" id="m-FIXED" onclick="setMode('FIXED')">🎨 Cor Fixa</button>
+        <button class="btn" id="m-CYCLE" onclick="setMode('CYCLE')">🌈 Ciclo RGB</button>
+        <button class="btn" id="m-BREATHING" onclick="setMode('BREATHING')">💨 Respiração</button>
+        <button class="btn" id="m-WAVE" onclick="setMode('WAVE')">🌊 Onda RGB</button>
+        <button class="btn" id="m-SCREEN_SAMPLER" onclick="setMode('SCREEN_SAMPLER')">🖥️ Screen Sampler</button>
+        <button class="btn" id="m-AUDIO_VISUALIZER" onclick="setMode('AUDIO_VISUALIZER')">🎵 Audio Visualizer</button>
+      </div>
+
+      <div class="swatches">
+        <div class="swatch" style="background:#00b4ff" onclick="setQuickColor('#00b4ff')"></div>
+        <div class="swatch" style="background:#b700ff" onclick="setQuickColor('#b700ff')"></div>
+        <div class="swatch" style="background:#ff0055" onclick="setQuickColor('#ff0055')"></div>
+        <div class="swatch" style="background:#ff8200" onclick="setQuickColor('#ff8200')"></div>
+        <div class="swatch" style="background:#00e676" onclick="setQuickColor('#00e676')"></div>
+        <div class="swatch" style="background:#ffffff" onclick="setQuickColor('#ffffff')"></div>
+      </div>
+
+      <div class="slider-row">
+        <span>Brilho (0x8040):</span>
+        <input type="range" min="0" max="100" value="100" onchange="setBrightness(this.value)" />
+      </div>
+
+      <div class="slider-row">
+        <span>Velocidade:</span>
+        <input type="range" id="speedRange" min="500" max="10000" step="250" value="4000" onchange="setSpeed(this.value)" />
+      </div>
+    </div>
+
+    <!-- Presets G HUB -->
+    <div class="card">
+      <h2>Presets Animados (Prefabs)</h2>
+      <div class="btn-row">
+        <button class="btn" onclick="setPrefab('CONTRASTIC')">⚡ Contrastic</button>
+        <button class="btn" onclick="setPrefab('OCEAN_WAVE')">🌊 Ocean Wave</button>
+        <button class="btn" onclick="setPrefab('LIGHTNING')">🌩️ Lightning</button>
+        <button class="btn" onclick="setPrefab('CYBERPUNK')">🌆 Cyberpunk</button>
+      </div>
+    </div>
+
+    <!-- Inspetor de Pacotes Bluetooth / HID++ -->
+    <div class="card">
+      <h2>Pacotes HID++ 2.0 Transmitidos (20 Bytes)</h2>
+      <div class="pkt-box" id="pktBox">Aguardando comandos...</div>
+    </div>
+  </div>
+
+  <script>
+    // UUIDs Oficiais Logitech BLE HID++ 2.0 e HOGP
+    const LOGI_BLE_SERVICE = '00010000-0000-1000-8000-011f2000046d';
+    const LOGI_BLE_CHAR    = '00010001-0000-1000-8000-011f2000046d';
+    const HOGP_SERVICE     = 0x1812;
+    const HOGP_REPORT_CHAR = 0x2a4d;
+
+    let bleChar = null;
+    let currentColor = '#00b4ff';
+
+    function hexToRgb(hex) {
+      hex = hex.replace('#', '');
+      return {
+        r: parseInt(hex.substring(0, 2), 16) || 0,
+        g: parseInt(hex.substring(2, 4), 16) || 0,
+        b: parseInt(hex.substring(4, 6), 16) || 0
+      };
+    }
+
+    function buildHidppFixedPacket(zone, r, g, b) {
+      const pkt = new Uint8Array(20);
+      pkt[0] = 0x11; pkt[1] = 0xFF; pkt[2] = 0x04; pkt[3] = 0x3E;
+      pkt[4] = zone; pkt[5] = 0x01; pkt[6] = r; pkt[7] = g; pkt[8] = b;
+      return pkt;
+    }
+
+    function logPacket(dir, bytes) {
+      const hex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0').toUpperCase()).join('-');
+      const box = document.getElementById('pktBox');
+      box.innerHTML = `<div>[${new Date().toLocaleTimeString()}] ${dir}: ${hex}</div>` + box.innerHTML;
+    }
+
+    async function connectWebBluetoothBle() {
+      if (window.AndroidLightsync) {
+        const paired = JSON.parse(window.AndroidLightsync.getPairedBluetoothDevices() || '[]');
+        if (paired.length > 0) {
+          window.AndroidLightsync.connectBluetoothDevice(paired[0].address, 'BLE');
+          return;
+        }
+      }
+
+      if (!navigator.bluetooth) {
+        alert('Use o Chrome no Android para Web Bluetooth ou conecte via Bridge Wi-Fi ativo!');
+        return;
+      }
+
+      try {
+        const device = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: [LOGI_BLE_SERVICE, HOGP_SERVICE]
+        });
+        document.getElementById('connLabel').innerText = 'Conectando...';
+        const server = await device.gatt.connect();
+
+        try {
+          const service = await server.getPrimaryService(LOGI_BLE_SERVICE);
+          bleChar = await service.getCharacteristic(LOGI_BLE_CHAR);
+        } catch {
+          const service = await server.getPrimaryService(HOGP_SERVICE);
+          bleChar = await service.getCharacteristic(HOGP_REPORT_CHAR);
+        }
+
+        document.getElementById('connLabel').innerText = device.name || 'BLE Conectado';
+        document.getElementById('statusSub').innerText = 'BLE GATT HID++ Direto Ativo';
+      } catch (e) {
+        document.getElementById('connLabel').innerText = 'Bridge Ativo';
+      }
+    }
+
+    function connectUsbOtgIfNative() {
+      if (window.AndroidLightsync) {
+        window.AndroidLightsync.connectUsbOtg();
+      } else {
+        alert('No aplicativo Android nativo (APK), conecte o cabo USB-C OTG ao G560 para controle USB direto pelo celular.');
+      }
+    }
+
+    async function setZone(z, hex) {
+      const { r, g, b } = hexToRgb(hex);
+      const pkt = buildHidppFixedPacket(z, r, g, b);
+      logPacket('TX Z' + z, pkt);
+
+      if (bleChar) {
+        try { await bleChar.writeValueWithoutResponse(pkt); } catch {}
+      }
+      if (window.AndroidLightsync) {
+        window.AndroidLightsync.setZoneColor(z, r, g, b);
+      }
+      try {
+        await fetch('/api/zone', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ zoneIndex: z, color: hex })
+        });
+      } catch {}
+    }
+
+    async function setMode(mode) {
+      const { r, g, b } = hexToRgb(currentColor);
+      const speedMs = parseInt(document.getElementById('speedRange').value, 10);
+
+      if (window.AndroidLightsync) {
+        if (mode === 'AUDIO_VISUALIZER') {
+          window.AndroidLightsync.startPhoneAudioVisualizer(true);
+        } else {
+          window.AndroidLightsync.setAllZonesEffect(mode, r, g, b, speedMs);
+        }
+      }
+      try {
+        await fetch('/api/mode', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mode, color: currentColor, speedMs })
+        });
+      } catch {}
+    }
+
+    function setQuickColor(hex) {
+      currentColor = hex;
+      setMode('FIXED');
+    }
+
+    function setSpeed(val) {
+      setMode('CYCLE');
+    }
+
+    async function setPrefab(prefab) {
+      const speedMs = parseInt(document.getElementById('speedRange').value, 10);
+      try {
+        await fetch('/api/prefab', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prefab, speedMs })
+        });
+      } catch {}
+    }
+
+    async function setBrightness(val) {
+      const b = parseInt(val, 10);
+      if (window.AndroidLightsync) {
+        window.AndroidLightsync.setBrightness(b);
+      }
+      try {
+        await fetch('/api/brightness', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ brightness: b })
+        });
+      } catch {}
+    }
+
+    window.onNativeStatus = (msg) => {
+      document.getElementById('statusSub').innerText = msg;
+    };
+
+    window.onNativePacket = (dir, hex) => {
+      const box = document.getElementById('pktBox');
+      box.innerHTML = `<div>[${new Date().toLocaleTimeString()}] ${dir}: ${hex}</div>` + box.innerHTML;
+    };
+
+    async function pollBridgeState() {
+      try {
+        const res = await fetch('/api/state');
+        const st = await res.json();
+        const z = st.liveZones || ['#00B4FF', '#00B4FF', '#00B4FF', '#00B4FF'];
+        document.getElementById('stageGlow').style.background = `
+          radial-gradient(circle at 25% 35%, ${z[1]}66 0%, transparent 45%),
+          radial-gradient(circle at 75% 35%, ${z[3]}66 0%, transparent 45%),
+          radial-gradient(circle at 30% 75%, ${z[0]}88 0%, transparent 40%),
+          radial-gradient(circle at 70% 75%, ${z[2]}88 0%, transparent 40%)
+        `;
+        for (let i = 0; i < 4; i++) {
+          document.getElementById('zc-' + i).style.borderColor = z[i];
+          document.getElementById('zh-' + i).innerText = z[i];
+        }
+      } catch {}
+      setTimeout(pollBridgeState, 150);
+    }
+    pollBridgeState();
+  </script>
+</body>
+</html>
